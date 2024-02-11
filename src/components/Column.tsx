@@ -1,78 +1,110 @@
-import { FC, useMemo, useState, KeyboardEventHandler, ChangeEventHandler } from "react"
-import { useBoardContext } from "@/contexts/BoardContext"
-import { type Column } from "@/lib/types"
-import Task from "@/components/Task"
-import Button from "@/components/ui/Button"
-import Input from "@/components/ui/Input"
+import { FC, useMemo, useState, KeyboardEventHandler, ChangeEventHandler, BaseSyntheticEvent } from 'react';
+import { useBoardContext } from '@/contexts/BoardContext';
+import { TaskType, type Column } from '@/lib/types';
+import Task from '@/components/Task';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import {CSS} from '@dnd-kit/utilities'
 
 type Props = {
-    column: Column
-}
+  column: Column;
+  tasks: Array<TaskType>
+};
 
-const Column: FC<Props> = ({ column: { id, title } }) => {
-    const { tasks, createTask, deleteColumn, updateColumn } = useBoardContext()
+const Column: FC<Props> = ({ column, column: { id, title }, tasks }) => {
+  const { createTask, deleteColumn, updateColumn } = useBoardContext();
 
-    const [inputValue, setInputValue] = useState(title)
-    const [isEditing, setIsEditing] = useState(!title)
+  const [isEditMode, setIsEditMode] = useState(false)
 
-    const columnTasks = useMemo(() => tasks.filter((task) => task.columnId === id), [tasks, id])
+  const {setNodeRef, attributes, listeners, transform, transition} = useSortable({
+    id,
+    data: {
+      type: "column",
+      column,
+    },
+    disabled: isEditMode,
+  })
 
-    const isEditingToggle = () => {
-        setIsEditing(!isEditing)
+  const [inputValue, setInputValue] = useState(title);
+
+  const [isEditing, setIsEditing] = useState(!title);
+
+  const tasksIds = useMemo(() => tasks.map(({id}) => id), [tasks])
+
+  const toggleEditing = () => setIsEditing(!isEditing)
+
+  const inputChangeHandler: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const newTitle = e.target.value;
+    setInputValue(newTitle);
+  };
+
+  const inputKeyDownHandler: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === 'Enter' && inputValue) {
+        updateColumn(id, inputValue);
+        setInputValue('')
+        toggleEditing();
     }
+  };
 
-    const inputChangeHandler: ChangeEventHandler<HTMLInputElement> = (e) => {
-        const newTitle = e.target.value
-        setInputValue(newTitle)
+  const inputBlurHandler = () => {
+    if (inputValue) {
+     toggleEditing();
+    updateColumn(id, inputValue);
     }
+  };
 
-    const inputKeyDownHandler: KeyboardEventHandler<HTMLInputElement> = (e) => {
-        if (e.key === 'Enter' && inputValue) {
-            isEditingToggle()
-            updateColumn(id, inputValue)
-        }
-    }
+  const createTaskButtonClickHandler = () => createTask(id);
 
-    const inputBlurHandler = () => {
-        if (inputValue) {
-            isEditingToggle()
-            updateColumn(id, inputValue)
-        }
-    }
+  const deleteColumnButtonClickHandler = () => deleteColumn(id);
 
-    const createTaskButtonClickHandler = () => {
-        createTask(id)
-    }
+  const columnClickHandler = () => {
+    setIsEditMode((prev) => !prev);
+  }
 
-    const deleteColumnButtonClickHandler = () => {
-        deleteColumn(id)
-    }
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  };
 
-    return (
-        <div className="h-full w-96 rounded-md bg-secondary py-2 flex flex-col gap-2 flex-shrink-0">
-            <div className="flex gap-2 px-2">
-                <div className="flex-grow">
-                    {isEditing ? (
-                        <Input value={inputValue} onChange={inputChangeHandler} onBlur={inputBlurHandler} onKeyDown={inputKeyDownHandler} placeholder="Column title" autoFocus />
-                    ) : (
-                        <div onClick={isEditingToggle} className="w-fit h-full hover:cursor-pointer hover:text-primary font-semibold">{title}</div>
-                    )}
-                </div>
+  return (
+    <div className='h-full w-96 rounded-md bg-secondary py-2 flex flex-col gap-2 flex-shrink-0' ref={setNodeRef}  style={style} {...attributes} {...listeners}  onClick={columnClickHandler} >
+      <div className='flex gap-2 px-2' >
+        <div className='flex-grow'>
+          {isEditing ? (
+            <Input
+              value={inputValue}
+              onChange={inputChangeHandler}
+              onBlur={inputBlurHandler}
+              onKeyDown={inputKeyDownHandler}
+              placeholder='Column title'
+              autoFocus
+            />
+          ) : (
+            <div onClick={toggleEditing} className='w-fit h-full hover:cursor-pointer hover:text-primary font-semibold'>
+              {title}
             </div>
-
-            <div className="flex flex-col gap-2 overflow-y-auto px-2 flex-grow">
-                {columnTasks.map((task) => (
-                    <Task key={task.id} task={task} />
-                ))}
-            </div>
-
-            <div className="px-2 flex justify-between">
-                <Button variant="destructive" onClick={deleteColumnButtonClickHandler}>Delete column</Button>
-
-                <Button onClick={createTaskButtonClickHandler}>Create task</Button>
-            </div>
+          )}
         </div>
-    )
-}
+      </div>
 
-export default Column       
+      <div className='flex flex-col gap-2 overflow-y-auto px-2 flex-grow'>
+        <SortableContext items={tasksIds}>
+        {tasks.map((task) => (
+          <Task key={task.id} task={task} />
+        ))}
+        </SortableContext>
+      </div>
+
+      <div className='px-2 flex justify-between'>
+        <Button variant='destructive' onClick={deleteColumnButtonClickHandler}>
+          Delete column
+        </Button>
+
+        <Button onClick={createTaskButtonClickHandler}>Create task</Button>
+      </div>
+    </div>
+  );
+};
+
+export default Column;

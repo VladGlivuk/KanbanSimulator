@@ -1,7 +1,8 @@
+import { FC } from "react"
 import { useBoardContext } from "@/contexts/BoardContext"
 import Button from "@/components/ui/Button"
 
-const Header = () => {
+const Header: FC = () => {
     const { createColumn } = useBoardContext()
 
     return (

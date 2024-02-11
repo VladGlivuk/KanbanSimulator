@@ -1,22 +1,25 @@
-import { FC, PropsWithChildren, createContext, useContext, useMemo, useState } from "react"
-import { Column, Task } from "@/lib/types"
+import { Dispatch, FC, PropsWithChildren, SetStateAction, createContext, useContext, useMemo, useState } from "react"
+import { Column, TaskType } from "@/lib/types"
+import { generateId } from "@/lib/utils"
 
 type BoardContextValue = {
     columns: Array<Column>
-    tasks: Array<Task>
+    tasks: Array<TaskType>
     createColumn: () => void
     deleteColumn: (id: string) => void
     updateColumn: (id: string, title: string) => void
     createTask: (columnId: string) => void
     deleteTask: (id: string) => void
     updateTask: (id: string, title: string) => void
+    setColumns: Dispatch<SetStateAction<Array<Column>>>
+    setTasks: Dispatch<SetStateAction<Array<TaskType>>>
 }
 
 const BoardContext = createContext<BoardContextValue | null>(null)
 
 export const BoardContextProvider: FC<PropsWithChildren> = ({ children }) => {
     const [columns, setColumns] = useState<Array<Column>>([])
-    const [tasks, setTasks] = useState<Array<Task>>([])
+    const [tasks, setTasks] = useState<Array<TaskType>>([])
 
     const createColumn = () => {
         setColumns([...columns, { id: crypto.randomUUID(), title: '' }])
@@ -32,7 +35,7 @@ export const BoardContextProvider: FC<PropsWithChildren> = ({ children }) => {
     }
 
     const createTask = (columnId: string) => {
-        setTasks([...tasks, { columnId, id: crypto.randomUUID(), title: '' }])
+        setTasks([...tasks, { columnId, id: generateId(), title: `task ${tasks.length + 1}` }])
     }
 
     const deleteTask = (id: string) => {
@@ -52,6 +55,8 @@ export const BoardContextProvider: FC<PropsWithChildren> = ({ children }) => {
         createTask,
         deleteTask,
         updateTask,
+        setColumns,
+        setTasks
     }), [columns, tasks])
 
     return <BoardContext.Provider value={contextValue}>{children}</BoardContext.Provider>

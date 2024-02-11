@@ -1,21 +1,31 @@
-import {useQuery} from "@apollo/client";
-import {ALL_POSTS} from "./apollo/posts";
+// import {useQuery} from "@apollo/client";
+// import {ALL_POSTS} from "./apollo/posts";
+
+import { BoardContextProvider } from "@/contexts/BoardContext";
+import RootLayout from "@/layouts/RootLayout";
+import Header from "@/components/Header";
+import Board from "@/components/Board";
 
 const App = () => {
-  const {loading, error, data} = useQuery(ALL_POSTS);
+  // const { loading, error, data } = useQuery(ALL_POSTS);
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>
+  // }
 
-  if (error) {
-    return <div>Error...</div>
-  }
+  // if (error) {
+  //   return <div>Error...</div>
+  // }
 
-  console.log(data);
+  // console.log(data);
 
   return (
-    <div className="text-red-800">App</div>
+    <BoardContextProvider>
+      <RootLayout>
+        <Header />
+        <Board />
+      </RootLayout>
+    </BoardContextProvider>
   )
 }
 

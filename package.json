@@ -5,20 +5,28 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "concurrently \"npm run dev\" \"npm run kill-ports && npm run server\"",
+    "kill-ports": "lsof -ti:4000 | xargs kill || true",
     "dev": "vite",
     "build": "tsc && vite build",
-    "commit": "bash ./gitCommit.sh"
+    "commit": "bash ./gitCommit.sh",
+    "server": "json-graphql-server db.ts --p 4000"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@apollo/client": "^3.9.4",
     "clsx": "^2.1.0",
+    "concurrently": "^8.2.2",
+    "graphql": "^15.8.0",
+    "json-graphql-server": "^2.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
+    "@types/node": "^20.11.17",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1",

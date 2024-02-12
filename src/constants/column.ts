@@ -1,6 +1,6 @@
-import { Column } from '@/lib/types';
+import { ColumnType } from '@/types';
 
-export const defaultColumn: Column = {
+export const defaultColumn: ColumnType = {
   id: '',
   title: '',
 };

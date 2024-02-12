@@ -1,14 +1,13 @@
 module.exports = {
-    posts: [
-        { id: 1, title: "Lorem Ipsum", views: 254, user_id: 123 },
-        { id: 2, title: "Sic Dolor amet", views: 65, user_id: 456 },
-    ],
-    users: [
-        { id: 123, name: "John Doe" },
-        { id: 456, name: "Jane Doe" }
-    ],
-    comments: [
-        { id: 987, post_id: 1, body: "Consectetur adipiscing elit", date: new Date('2017-07-03') },
-        { id: 995, post_id: 1, body: "Nam molestie pellentesque dui", date: new Date('2017-08-17') }
-    ]
-}
+  columns: [
+    { id: 'column1', title: 'To Do' },
+    { id: 'column2', title: 'In Progress' },
+    { id: 'column3', title: 'Done' },
+  ],
+  tasks: [
+    { id: 'task1', title: 'Task 1', columnId: 'column1', createdAt: new Date('2021-12-14') },
+    { id: 'task2', title: 'Task 2', columnId: 'column1', createdAt: new Date('2023-12-14') },
+    { id: 'task3', title: 'Task 3', columnId: 'column2', createdAt: new Date('2020-12-14') },
+    { id: 'task4', title: 'Task 4', columnId: 'column3', createdAt: new Date('2024-12-14') },
+  ],
+};

@@ -21,6 +21,7 @@
     "@dnd-kit/sortable": "^8.0.0",
     "clsx": "^2.1.0",
     "concurrently": "^8.2.2",
+    "dayjs": "^1.11.10",
     "graphql": "^15.8.0",
     "json-graphql-server": "^2.3.2",
     "react": "^18.2.0",
